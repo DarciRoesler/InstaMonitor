@@ -17,3 +17,31 @@ List<string> naoSigoDeVolta = new List<string>();
 
 string[] splitSeguindo = seguindoHtml.Split(new[] { "perfil de " }, StringSplitOptions.RemoveEmptyEntries);
 string[] splitSeguidores = seguidoresHtml.Split(new[] { "perfil de " }, StringSplitOptions.RemoveEmptyEntries);
+
+foreach (string linha in splitSeguindo)
+{
+    string user = linha.Substring(0, linha.IndexOf('\"'));
+    seguindo.Add(user);
+}
+
+foreach (string linha in splitSeguidores)
+{
+    string user = linha.Substring(0, linha.IndexOf('\"'));
+    seguidores.Add(user);
+}
+
+foreach (string line in seguindo)
+{
+    if (!seguidores.Contains(line))
+    {
+        naoSeguemDeVolta.Add(line);
+    }
+}
+
+foreach (string line in seguidores)
+{
+    if (!seguindo.Contains(line))
+    {
+        naoSigoDeVolta.Add(line);
+    }
+}
