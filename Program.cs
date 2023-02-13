@@ -45,3 +45,14 @@ foreach (string line in seguidores)
         naoSigoDeVolta.Add(line);
     }
 }
+
+seguindo.Remove("<div style=");
+seguidores.Remove("<div style=");
+
+File.WriteAllLines(arquivoSeguindo, seguindo);
+File.WriteAllLines(arquivoSeguidores, seguidores);
+File.WriteAllLines(arquivoNaoSeguemDeVolta, naoSeguemDeVolta);
+File.WriteAllLines(arquivoNaoSigoDeVolta, naoSigoDeVolta);
+
+Console.WriteLine("Deu certo!");
+Console.ReadLine();
