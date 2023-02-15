@@ -12,5 +12,10 @@
             Status = status;
             DateTime = dateTime;
         }
+
+        public override string ToString()
+        {
+            return Usuario.Nome + ";" + Status.ToString() + ";" + DateTime.ToString("d") + "/";
+        }
     }
 }

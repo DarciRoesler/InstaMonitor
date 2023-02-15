@@ -11,6 +11,7 @@ string path = @"c:\InstaMonitor";
 
 // Identificação dos arquivos no diretório
 string arquivoUsuarios = path + "\\usuarios.txt";
+string arquivoUpdates = path + "\\updates.txt";
 string arquivoSeguindo = path + "\\seguindo.txt";
 string arquivoSeguidores = path + "\\seguidores.txt";
 string arquivoSeguindoHtml = path + "\\seguindoHtml.txt";
@@ -69,36 +70,61 @@ foreach (string nome in seguidores)
     }
 }
 
+// Faz a leitura dos registros de Updates já existentes
+string updatesBase = File.ReadAllText(arquivoUpdates);
+string[] splitUpdates = updatesBase.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+foreach (string update in splitUpdates)
+{
+    string[] info = update.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+    updates.Add(new Update(usuarios.FirstOrDefault(x => x.Nome == info[0]), Enum.Parse<Status>(info[1]), DateTime.Parse(info[2])));
+}
+
+
 // Atualiza cada registro de usuário
 foreach (Usuario usuario in usuarios)
 {
+    usuario.ListaUpdates = new List<Update>();
     if (seguidores.ToList().Exists(x => x == usuario.Nome) && !usuario.MeSegue)
     {
         usuario.MeSegue = true;
+        updates.Add(new Update(usuario, Status.ComecouAMeSeguir, DateTime.Today));
     }
     if (!seguidores.ToList().Exists(x => x == usuario.Nome) && usuario.MeSegue)
     {
         usuario.MeSegue = false;
+        updates.Add(new Update(usuario, Status.ParouDeMeSeguir, DateTime.Today));
     }
     if (seguindo.ToList().Exists(x => x == usuario.Nome) && !usuario.EuSigo)
     {
         usuario.EuSigo = true;
+        updates.Add(new Update(usuario, Status.EuSegui, DateTime.Today));
     }
     if (!seguindo.ToList().Exists(x => x == usuario.Nome) && usuario.EuSigo)
     {
         usuario.EuSigo = false;
+        updates.Add(new Update(usuario, Status.EuPareiDeSeguir, DateTime.Today));
     }
+
+    usuario.ListaUpdates.AddRange(updates.Where(x => x.Usuario?.Nome== usuario.Nome).ToList());
 }
 
-// Cria o txt que será enviado ao arquivo
+// Cria o txt que será enviado ao arquivo de usuários
 string? usuariostxt = null;
 foreach (Usuario usuario in usuarios)
 {
     usuariostxt += usuario.ToString();
 }
 
+// Cria o txt que será enviado ao arquivo de updates
+string? updatestxt = null;
+foreach (Update update in updates)
+{
+    updatestxt += update.ToString();
+}
+
 // Grava os dados nos arquivos
 File.WriteAllText(arquivoUsuarios, usuariostxt);
+File.WriteAllText(arquivoUpdates, updatestxt);
 File.WriteAllLines(arquivoSeguindo, seguindo);
 File.WriteAllLines(arquivoSeguidores, seguidores);
 
